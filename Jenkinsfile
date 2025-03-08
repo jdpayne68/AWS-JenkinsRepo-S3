@@ -1,7 +1,15 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = 'us-west-2' 
+pipeline {
+    agent any
+    environment {
+        AWS_REGION = 'us-west-2'
+    }
+    stages {
+        stage('Set AWS Credentials') {
+            steps {
+                withCredentials([[        AWS_REGION = 'us-west-2' 
     }
     stages {
         stage('Set AWS Credentials') {
@@ -86,11 +94,31 @@ pipeline {
                     sh '''
                     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                     export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-                    terraform apply -auto-approve tfplan
-                    '''
+                    terraform apply -auto-approve tfplan                    '''
                 }
             }
         }
+
+//dastardly docker pull
+        stage ("Docker Pull Dastardly from Burp Suite container image") {
+            steps {
+                sh 'docker pull public.ecr.aws/portswigger/dastardly:latest'
+            }
+        }
+        
+//dastardly docker run (https://www.ginandjuice.shop)
+        stage ("Docker run Dastardly from Burp Suite Scan") {
+            steps {
+                cleanWs()
+                sh '''
+                    docker run --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                    -e BURP_START_URL=https://ginandjuice.shop/ \
+                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
+                    public.ecr.aws/portswigger/dastardly:latest
+                '''
+            }
+        
+    
 
         stage ('Destroy Terraform') {
             steps {
@@ -122,3 +150,4 @@ pipeline {
         }
     }
 }
+
