@@ -89,8 +89,6 @@ pipeline {
             }
         }
         
-
-
 stage ('Destroy Terraform') {
             steps {
                 input message: "Do you want to destroy the infrastructure?", ok: "Destroy"
@@ -110,7 +108,8 @@ stage ('Destroy Terraform') {
     post {
         always {
             junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
-        }success {
+        }
+        success {
             echo 'Terraform deployment completed successfully!'
         }
         failure {
