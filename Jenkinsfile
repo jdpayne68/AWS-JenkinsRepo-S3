@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/jdpayne68/Jenkins-CI-CD-DevSecOps.git' 
+                git branch: 'main', url: 'https://git@github.com:jdpayne68/AWS-JenkinsRepo-S3.git' 
             }
         }
         stage('Initialize Terraform') {
