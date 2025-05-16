@@ -88,11 +88,7 @@ pipeline {
                 '''
             }
         }
-        }
-        post {
-        always {
-            junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
-        }
+        
 
 
 stage ('Destroy Terraform') {
@@ -112,7 +108,9 @@ stage ('Destroy Terraform') {
         }
     }
     post {
-        success {
+        always {
+            junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
+        }success {
             echo 'Terraform deployment completed successfully!'
         }
         failure {
