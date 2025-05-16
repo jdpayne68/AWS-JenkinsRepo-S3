@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/aaron-dm-mcdonald/jenkins-ec2.git' 
+                git branch: 'main', url: 'https://github.com/jdpayne68/Jenkins-CI-CD-DevSecOps.git' 
             }
         }
         stage('Initialize Terraform') {
