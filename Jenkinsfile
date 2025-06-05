@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'hashicorp/terraform:1.8.3'
-            args '-u root'
-        }
-    }
+    agent any
     environment {
         AWS_REGION = 'us-west-2' 
     }
