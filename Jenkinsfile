@@ -27,7 +27,7 @@ pipeline {
 // dastardly docker pull
         stage ("Docker run Dastardly from Burp Suite Scan") {
             agent {         
-                dockerContainer {          
+                docker {          
                     image 'public.ecr.aws/portswigger/dastardly:latest'         
                 }       
             }       
