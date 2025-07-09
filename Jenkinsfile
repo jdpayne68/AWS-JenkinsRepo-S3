@@ -17,11 +17,33 @@ pipeline {
                 }
             }
         }
+        
         stage('Checkout GitHub Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git' 
+                git branch: 'main', url: 'https://github.com/jdpayne68AWS_SECRET_ACCESS_KEYRepo-S3.git' 
             }
         }
+
+// dastardly docker pull
+        stage ("Docker run Dastardly from Burp Suite Scan") {
+            agent {         
+                dockerContainer {          
+                    image 'public.ecr.aws/portswigger/dastardly:latest'         
+                }       
+            }       
+                       
+            steps {
+                cleanWs()
+                sh '''
+                    
+                    docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                    -e BURP_START_URL=https://ginandjuice.shop/ \
+                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
+                    public.ecr.aws/portswigger/dastardly:latest
+                '''
+            }
+        }
+
         stage('Initialize Terraform') {
             steps {
                 sh '''
@@ -37,8 +59,7 @@ pipeline {
                 '''
             }
         }
-
-
+        
         stage('Plan Terraform') {
             steps {
                 withCredentials([[
@@ -53,6 +74,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Apply Terraform') {
             steps {
                 input message: "Approve Terraform Apply?", ok: "Deploy"
@@ -69,27 +91,7 @@ pipeline {
             }
         }
 
-//dastardly docker pull
-        stage ("Docker Pull Dastardly from Burp Suite container image") {
-            steps {
-                sh 'docker pull public.ecr.aws/portswigger/dastardly:latest'
-            }
-        }
-
-//dastardly docker run (https://ginandjuice.shop/)       
-        stage ("Docker run Dastardly from Burp Suite Scan") {
-            steps {
-                cleanWs()
-                sh '''
-                    docker run --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
-                    -e BURP_START_URL=https://ginandjuice.shop/ \
-                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
-                    public.ecr.aws/portswigger/dastardly:latest
-                '''
-            }
-        }
-        
-stage ('Destroy Terraform') {
+        stage ('Destroy Terraform') {
             steps {
                 input message: "Do you want to destroy the infrastructure?", ok: "Destroy"
                 withCredentials([[
@@ -105,10 +107,12 @@ stage ('Destroy Terraform') {
             }
         }
     }
+    
     post {
         always {
             junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
         }
+        
         success {
             echo 'Terraform deployment completed successfully!'
         }
