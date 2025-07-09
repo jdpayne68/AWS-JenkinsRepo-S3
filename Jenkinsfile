@@ -20,7 +20,7 @@ pipeline {
         
         stage('Checkout GitHub Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/jdpayne68AWS-Repo-S3.git' 
+                git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git' 
             }
         }
 
