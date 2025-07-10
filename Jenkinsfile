@@ -24,27 +24,6 @@ pipeline {
             }
         }
 
-// dastardly docker pull
-        stage ("Docker run Dastardly from Burp Suite Scan") {
-            agent {         
-                docker {          
-                    image 'public.ecr.aws/portswigger/dastardly:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'  // Bind-mount the Docker socket
-                }       
-            }       
-                       
-            steps {
-                cleanWs()
-                sh '''
-                    
-                    docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
-                    -e BURP_START_URL=https://ginandjuice.shop/ \
-                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
-                    public.ecr.aws/portswigger/dastardly:latest
-                '''
-            }
-        }
-
         stage('Initialize Terraform') {
             steps {
                 sh '''
@@ -73,6 +52,27 @@ pipeline {
                     terraform plan -out=tfplan
                     '''
                 }
+            }
+        }
+
+// dastardly docker pull
+        stage ("Docker run Dastardly from Burp Suite Scan") {
+            agent {         
+                docker {          
+                    image 'public.ecr.aws/portswigger/dastardly:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'  // Bind-mount the Docker socket
+                }       
+            }       
+                       
+            steps {
+                cleanWs()
+                sh '''
+                    
+                    docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                    -e BURP_START_URL=https://ginandjuice.shop/ \
+                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
+                    public.ecr.aws/portswigger/dastardly:latest
+                '''
             }
         }
         
