@@ -28,7 +28,8 @@ pipeline {
         stage ("Docker run Dastardly from Burp Suite Scan") {
             agent {         
                 docker {          
-                    image 'public.ecr.aws/portswigger/dastardly:latest'         
+                    image 'public.ecr.aws/portswigger/dastardly:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'  // Bind-mount the Docker socket
                 }       
             }       
                        
