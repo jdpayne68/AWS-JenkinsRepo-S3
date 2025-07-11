@@ -8,6 +8,7 @@ variable "vpc_cidr" {
 }
 
 variable "subnet_cidr_blocks" {
+
   description = "CIDR blocks for all subnets by name"
   type = object({
     private-us-east-1a = string

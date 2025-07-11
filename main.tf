@@ -9,8 +9,7 @@ terraform {
 
 #Configuration for AWS provider
 provider "aws" {
-  region  = var.region # Use the default region or specify a region
-  profile = "default"   # Use the default profile or specify a profile
+  region  = var.region # Use the default region or specify a region   # Use the default profile or specify a profile
 }
 
 #Create a VPC with 2 private and public subnets respectively
