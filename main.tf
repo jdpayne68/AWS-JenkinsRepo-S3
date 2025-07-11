@@ -93,6 +93,7 @@ resource "aws_nat_gateway" "nat" {
 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
+
   route = {
       cidr_block                 = "192.0.0.0/24"
       nat_gateway_id             = aws_nat_gateway.nat.id
@@ -108,7 +109,6 @@ resource "aws_route_table" "private" {
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
     }
-
   tags = {
     Name = "private"
   }
@@ -116,6 +116,7 @@ resource "aws_route_table" "private" {
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
+
 
   route = {
       cidr_block                 = "192.0.64.0/24"
@@ -131,9 +132,8 @@ resource "aws_route_table" "public" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
-  
 
+    }
   tags = {
     Name = "private"
   }
@@ -177,7 +177,6 @@ resource "aws_security_group" "jenkins_sg" {
   name        = "jenkins-sg"
   description = "Allow SSH into Jenkins Instance"
   vpc_id      = aws_vpc.main.id
-
   ingress {
     description = "SSH"
     from_port   = 22
@@ -201,8 +200,6 @@ resource "aws_security_group" "jenkins_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-
 resource "aws_instance" "jenkins" {
   ami           = "ami-ami-05ffe3c48a9991133" # Replace with a valid AMI ID for your region
   instance_type = "t2.medium" #replace with your desired instance type
@@ -214,8 +211,6 @@ resource "aws_instance" "jenkins" {
 
 vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   associate_public_ip_address = true
-
-
 
 # User data script to install Docker and run Jenkins
   # This script will be executed on instance creation

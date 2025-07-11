@@ -1,4 +1,4 @@
- Ignore Terraform state files
+<# Ignore Terraform state files
 *.tfstate
 *.tfstate.*
 
@@ -11,5 +11,5 @@
 # Ignore executable files
 *.exe
 
-#Ignore .jsonfiles  
+# Ignore .json files  
 *.json
