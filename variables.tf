@@ -12,17 +12,17 @@ variable "subnet_cidr_blocks" {
   type = object({
     private-us-east-1a = string
     #private-us-east-1b = string
-    public-us-east-1a  = string
+    public-us-east-1a = string
     #public-us-east-1b  = string
   })
   default = {
     private-us-east-1a = "192.0.0.0/24"
     #private-us-east-1b = "192.0.32.0/24"
 
-    public-us-east-1a  = "192.0.64.0/24"
+    public-us-east-1a = "192.0.64.0/24"
     #public-us-east-1b  = "192.0.96.0/24"
 
-    public-us-east-1a  = "192.0.64.0/24"
+    public-us-east-1a = "192.0.64.0/24"
     #public-us-east-1b  = "192.0.96.0/24"
   }
 }
