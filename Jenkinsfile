@@ -26,11 +26,15 @@ pipeline {
             }
         }
         
+<<<<<<< HEAD
         stage('Checkout GitHub Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git' 
             }
         }
+=======
+       
+>>>>>>> 20ec0bf (revised)
 
         stage('Initialize Terraform') {
             steps {
@@ -62,6 +66,7 @@ pipeline {
                 }
             }
         }
+<<<<<<< HEAD
 
 // dastardly docker pull
         stage ("Docker run Dastardly from Burp Suite Scan") {
@@ -83,6 +88,8 @@ pipeline {
                 '''
             }
         }
+=======
+>>>>>>> 20ec0bf (revised)
         
         stage('Apply Terraform') {
             steps {
@@ -99,26 +106,42 @@ pipeline {
             }
         }
 
+<<<<<<< HEAD
 //dastardly docker pull
         stage ("Docker Pull Dastardly from Burp Suite container image") {
+=======
+ stage('Checkout GitHub Code') {
+>>>>>>> 20ec0bf (revised)
             steps {
-                sh 'docker pull public.ecr.aws/portswigger/dastardly:latest'
+                git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git' 
             }
         }
-        
-//dastardly docker run (https://www.ginandjuice.shop)
+
+// dastardly docker pull
         stage ("Docker run Dastardly from Burp Suite Scan") {
+            agent {         
+                docker {          
+                    image 'public.ecr.aws/portswigger/dastardly:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'  // Bind-mount the Docker socket         
+                }       
+            }       
+                       
             steps {
                 cleanWs()
                 sh '''
-                    docker run --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                    
+                    docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
                     -e BURP_START_URL=https://ginandjuice.shop/ \
                     -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
                     public.ecr.aws/portswigger/dastardly:latest
                 '''
             }
+<<<<<<< HEAD
         
     
+=======
+        }
+>>>>>>> 20ec0bf (revised)
 
         stage ('Destroy Terraform') {
             steps {
@@ -150,4 +173,3 @@ pipeline {
         }
     }
 }
-

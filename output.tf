@@ -5,4 +5,8 @@ output "jenkins_public_ip" {
 output "jenkins_private_ip" {
   value       = aws_instance.jenkins.private_ip
   description = "Jenkins server private IP"
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 20ec0bf (revised)

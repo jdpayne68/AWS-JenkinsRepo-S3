@@ -96,7 +96,11 @@ resource "aws_route_table" "private" {
 
   route = [
     {
+<<<<<<< HEAD
       cidr_block                 = "0.0.0.0/0"
+=======
+      cidr_block                 = "192.0.0.0/24"
+>>>>>>> 20ec0bf (revised)
       nat_gateway_id             = aws_nat_gateway.nat.id
       carrier_gateway_id         = ""
       destination_prefix_list_id = ""
@@ -122,7 +126,11 @@ resource "aws_route_table" "public" {
 
   route = [
     {
+<<<<<<< HEAD
       cidr_block                 = "0.0.0.0/0"
+=======
+      cidr_block                 = "192.0.64.0/24"
+>>>>>>> 20ec0bf (revised)
       gateway_id                 = aws_internet_gateway.igw.id
       nat_gateway_id             = ""
       carrier_gateway_id         = ""
@@ -180,7 +188,11 @@ resource "aws_key_pair" "jenkins_key" {
 resource "aws_security_group" "jenkins_sg" {
   name        = "jenkins-sg"
   description = "Allow SSH into Jenkins Instance"
+<<<<<<< HEAD
   vpc_id      = data.aws_vpc.default.id
+=======
+  vpc_id      = aws_vpc.main.id
+>>>>>>> 20ec0bf (revised)
 
   ingress {
     description = "SSH"
@@ -207,7 +219,11 @@ resource "aws_security_group" "jenkins_sg" {
 }
 
 
+<<<<<<< HEAD
 resource "aws_ec2_instance" "jenkins" {
+=======
+resource "aws_instance" "jenkins" {
+>>>>>>> 20ec0bf (revised)
   ami           = "ami-ami-05ffe3c48a9991133" # Replace with a valid AMI ID for your region
   instance_type = "t2.medium" #replace with your desired instance type
   subnet_id     = aws_subnet.public-us-east-1a.id
