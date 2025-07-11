@@ -1,14 +1,14 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = 'us-west-2' 
+        AWS_REGION = 'us-east-1'
     }
     stages {
         stage('Set AWS Credentials') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AWS_SECRET_ACCESS_KEY' 
+                    credentialsId: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     sh '''
                     echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
@@ -17,25 +17,16 @@ pipeline {
                 }
             }
         }
-        
-       
-
         stage('Initialize Terraform') {
             steps {
-                sh '''
-                terraform init
-                '''
+                sh 'terraform init'
             }
         }
-        
         stage('Validate Terraform') {
             steps {
-                sh '''
-                terraform validate
-                '''
+                sh 'terraform validate'
             }
         }
-        
         stage('Plan Terraform') {
             steps {
                 withCredentials([[
@@ -50,7 +41,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Apply Terraform') {
             steps {
                 input message: "Approve Terraform Apply?", ok: "Deploy"
@@ -66,35 +56,33 @@ pipeline {
                 }
             }
         }
-
- stage('Checkout GitHub Code') {
+        stage('Checkout GitHub Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git' 
+                git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git'
             }
         }
-
-// dastardly docker pull
-        stage ("Docker run Dastardly from Burp Suite Scan") {
-            agent {         
-                docker {          
-                    image 'public.ecr.aws/portswigger/dastardly:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'  // Bind-mount the Docker socket         
-                }       
-            }       
-                       
+        stage('Docker Run Example Scan') {
             steps {
-                cleanWs()
                 sh '''
-                    
-                    docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
-                    -e BURP_START_URL=https://ginandjuice.shop/ \
-                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
-                    public.ecr.aws/portswigger/dastardly:latest
+                docker run --rm --pull=always \
+                -u $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw -w ${WORKSPACE} \
+                -e BURP_CONFIG_FILE_PATH=${WORKSPACE}/burp_config.yml \
+                public.ecr.aws/portswigger/enterprise-scan-container:latest
                 '''
             }
         }
-
-        stage ('Destroy Terraform') {
+        
+        stage('Dastardly Scan') {
+            steps {
+                sh '''
+                docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                -e BURP_START_URL=https://ginandjuice.shop/ \
+                -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
+                public.ecr.aws/portswigger/dastardly:latest
+                '''
+            }
+        }
+        stage('Destroy Terraform') {
             steps {
                 input message: "Do you want to destroy the infrastructure?", ok: "Destroy"
                 withCredentials([[
@@ -110,17 +98,11 @@ pipeline {
             }
         }
     }
-    
     post {
         always {
-            junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
-        }
-        
-        success {
-            echo 'Terraform deployment completed successfully!'
-        }
-        failure {
-            echo 'Terraform deployment failed!'
+            junit testResults: 'burp_junit_report.xml', skipPublishingChecks: true, allowEmptyResults: true
+            // junit testResults: 'dastardly-report.xml', skipPublishingChecks: true, allowEmptyResults: true
+            cleanWs()
         }
     }
 }

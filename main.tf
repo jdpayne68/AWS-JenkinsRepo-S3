@@ -93,9 +93,7 @@ resource "aws_nat_gateway" "nat" {
 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
-
-  route = [
-    {
+  route = {
       cidr_block                 = "192.0.0.0/24"
       nat_gateway_id             = aws_nat_gateway.nat.id
       carrier_gateway_id         = ""
@@ -109,8 +107,7 @@ resource "aws_route_table" "private" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    },
-  ]
+    }
 
   tags = {
     Name = "private"
@@ -120,8 +117,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
-  route = [
-    {
+  route = {
       cidr_block                 = "192.0.64.0/24"
       gateway_id                 = aws_internet_gateway.igw.id
       nat_gateway_id             = ""
@@ -135,8 +131,8 @@ resource "aws_route_table" "public" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    },
-  ]
+    }
+  
 
   tags = {
     Name = "private"
@@ -212,7 +208,6 @@ resource "aws_instance" "jenkins" {
   instance_type = "t2.medium" #replace with your desired instance type
   subnet_id     = aws_subnet.public-us-east-1a.id
   key_name      = aws_key_pair.jenkins_key.key_name
-
   tags = {
     Name = "Jenkins Instance"
   }
@@ -220,9 +215,7 @@ resource "aws_instance" "jenkins" {
 vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   associate_public_ip_address = true
 
-  tag = {
-    Name = "jenkins-devsecops"
-  }
+
 
 # User data script to install Docker and run Jenkins
   # This script will be executed on instance creation
