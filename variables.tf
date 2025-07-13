@@ -1,9 +1,12 @@
+#Define the AWS region where resources will be created
 variable "region" {
+  description = "AWS region to deploy resources"
   default = "us-east-1"
 }
 
 # core VPC paramters 
 variable "vpc_cidr" {
+  description = "CIDR block for the main VPC"
   default = "192.0.0.0/16"
 }
 

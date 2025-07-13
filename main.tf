@@ -67,25 +67,24 @@ resource "aws_nat_gateway" "nat" {
   }
 }
 
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block                 = "0.0.0.0/0"
+    gateway_id                 = aws_internet_gateway.igw.id
+  }
+  tags = {
+    Name = "public"
+  }
+}
+
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   route {
     cidr_block                 = "0.0.0.0/0"
     nat_gateway_id             = aws_nat_gateway.nat.id
-
-  }
-  tags = {
-    Name = "private"
-  }
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-
-  route {
-    cidr_block                 = "192.0.64.0/24"
-    gateway_id                 = aws_internet_gateway.igw.id
+    
+    
   }
   tags = {
     Name = "private"
@@ -111,7 +110,7 @@ resource "aws_security_group" "jenkins_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.subnet_cidr_blocks[public-us-east-1a]]
+    cidr_blocks = [var.subnet_cidr_blocks["public-us-east-1a"]]
   }
   ingress {
     description = "Jenkins UI"
@@ -166,8 +165,16 @@ resource "aws_instance" "jenkins" {
 resource "aws_s3_bucket" "frontend" {
   bucket_prefix = "jenkins-bucket-"
   force_destroy = true
-
   tags = {
     Name = "Jenkins Bucket"
   }
 }
+resource "aws_s3_public_access_block" "jenkins_bucket_public_access_block" {
+  bucket = aws_s3_bucket.frontend.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+  
+
