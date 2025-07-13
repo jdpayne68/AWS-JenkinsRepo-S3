@@ -129,9 +129,9 @@ resource "aws_security_group" "jenkins_sg" {
   tags = {
     Name = "jenkins-sg"
   }
-
+}
 resource "aws_instance" "jenkins" {
-  ami           = "ami-05ffe3c48a9991133" # Replace with a valid AMI ID for your region
+  ami           = "ami-0150ccaf51ab55a51" # Replace with a valid AMI ID for your region
   instance_type = "t2.medium"                 #Replace with your desired instance type
   subnet_id     = aws_subnet.public-us-east-1a.id
   key_name      = "Jenkins-Server" # Replace with your key pair name (mine was created manually in AWS)
