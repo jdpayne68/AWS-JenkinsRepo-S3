@@ -160,12 +160,6 @@ resource "aws_route_table_association" "public-us-east-1a" {
 #   route_table_id = aws_route_table.public.id
 # }
 
-#Create a key pair for SSH access
-resource "aws_key_pair" "jenkins_key" {
-  key_name   = var.key_name
-  public_key = file(var.public_key_path)
-}
-
 resource "aws_security_group" "jenkins_sg" {
   name        = "jenkins-sg"
   description = "Allow SSH into Jenkins Instance"
@@ -195,9 +189,9 @@ resource "aws_security_group" "jenkins_sg" {
 }
 resource "aws_instance" "jenkins" {
   ami           = "ami-ami-05ffe3c48a9991133" # Replace with a valid AMI ID for your region
-  instance_type = "t2.medium"                 #replace with your desired instance type
+  instance_type = "t2.medium"                 #Replace with your desired instance type
   subnet_id     = aws_subnet.public-us-east-1a.id
-  key_name      = aws_key_pair.jenkins_key.key_name
+  key_name      = "Jenkins-Server" # Replace with your key pair name (mine was created manually in AWS)
   tags = {
     Name = "Jenkins Instance"
   }
