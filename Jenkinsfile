@@ -61,21 +61,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/jdpayne68/AWS-JenkinsRepo-S3.git'
             }
         }
-        stage('Docker Run Example Scan') {
-            steps {
-                sh '''
-                docker run --rm --pull=always \
-                -u $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw -w ${WORKSPACE} \
-                -e BURP_CONFIG_FILE_PATH=${WORKSPACE}/burp_config.yml \
-                public.ecr.aws/portswigger/enterprise-scan-container:latest
-                '''
-            }
-        }
+       
         
         stage('Dastardly Scan') {
             steps {
                 sh '''
-                docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                docker run --rm --user $(id -u) -v "$PWD:$PWD" -w "$PWD" \
                 -e BURP_START_URL=https://ginandjuice.shop/ \
                 -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
                 public.ecr.aws/portswigger/dastardly:latest
@@ -98,11 +89,12 @@ pipeline {
             }
         }
     }
-    post {
+   post {
         always {
-            junit testResults: 'burp_junit_report.xml', skipPublishingChecks: true, allowEmptyResults: true
-            // junit testResults: 'dastardly-report.xml', skipPublishingChecks: true, allowEmptyResults: true
+            // Publish Dastardly scan results as JUnit
+            junit testResults: 'dastardly-report.xml', allowEmptyResults: true
+            archiveArtifacts artifacts: 'dastardly-report.xml', fingerprint: true
             cleanWs()
         }
-    }
+    } 
 }
